@@ -7,18 +7,33 @@ import "../App.css";
 function ConfigsPage() {
   const [configs, setConfigs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    let mounted = true;
+  const fetchConfigs = () => {
+    setLoading(true);
+    setError("");
     api
       .get("/configs/")
-      .then((resp) => {
-        if (mounted) setConfigs(resp.data || []);
-      })
-      .catch(() => {})
+      .then((resp) => setConfigs(resp.data || []))
+      .catch(() => setError("Failed to fetch configs"))
       .finally(() => setLoading(false));
-    return () => (mounted = false);
+  };
+
+  useEffect(() => {
+    fetchConfigs();
+    // eslint-disable-next-line
   }, []);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this config?")) return;
+    setError("");
+    try {
+      await api.delete(`/configs/${id}`);
+      setConfigs((prev) => prev.filter((c) => c.id !== id));
+    } catch {
+      setError("Failed to delete config");
+    }
+  };
 
   return (
     <div>
@@ -28,6 +43,7 @@ function ConfigsPage() {
           + Add Config
         </Link>
       </div>
+      {error && <div className="form-error" style={{ marginBottom: 8 }}>{error}</div>}
       {loading ? (
         <div>Loading...</div>
       ) : configs.length === 0 ? (
@@ -61,6 +77,13 @@ function ConfigsPage() {
                   >
                     Edit
                   </Link>
+                  <button
+                    className="btn btn-link"
+                    style={{ color: "#b92d2b", marginLeft: 8 }}
+                    onClick={() => handleDelete(cfg.id)}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}

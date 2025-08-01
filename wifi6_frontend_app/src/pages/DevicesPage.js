@@ -7,18 +7,33 @@ import "../App.css";
 function DevicesPage() {
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    let mounted = true;
+  const fetchDevices = () => {
+    setLoading(true);
+    setError("");
     api
       .get("/devices/")
-      .then((resp) => {
-        if (mounted) setDevices(resp.data || []);
-      })
-      .catch(() => {})
+      .then((resp) => setDevices(resp.data || []))
+      .catch(() => setError("Failed to fetch devices"))
       .finally(() => setLoading(false));
-    return () => (mounted = false);
+  };
+
+  useEffect(() => {
+    fetchDevices();
+    // eslint-disable-next-line
   }, []);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this device?")) return;
+    setError("");
+    try {
+      await api.delete(`/devices/${id}`);
+      setDevices((prev) => prev.filter((d) => d.id !== id));
+    } catch {
+      setError("Failed to delete device");
+    }
+  };
 
   return (
     <div>
@@ -28,6 +43,7 @@ function DevicesPage() {
           + Add Device
         </Link>
       </div>
+      {error && <div className="form-error" style={{ marginBottom: 8 }}>{error}</div>}
       {loading ? (
         <div>Loading...</div>
       ) : devices.length === 0 ? (
@@ -55,7 +71,7 @@ function DevicesPage() {
                       color:
                         dev.device_status === "online"
                           ? "green"
-                          : "var(--secondary, #666)"
+                          : "var(--secondary, #666)",
                     }}
                   >
                     {dev.device_status}
@@ -65,6 +81,13 @@ function DevicesPage() {
                   <Link to={`/devices/${dev.id}/edit`} className="btn btn-link">
                     Edit
                   </Link>
+                  <button
+                    className="btn btn-link"
+                    style={{ color: "#b92d2b", marginLeft: 8 }}
+                    onClick={() => handleDelete(dev.id)}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
