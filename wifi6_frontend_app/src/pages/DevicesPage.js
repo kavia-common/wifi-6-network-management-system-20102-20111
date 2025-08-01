@@ -1,0 +1,78 @@
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import api from "../api";
+import "../App.css";
+
+// PUBLIC_INTERFACE
+function DevicesPage() {
+  const [devices, setDevices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    api
+      .get("/devices/")
+      .then((resp) => {
+        if (mounted) setDevices(resp.data || []);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+    return () => (mounted = false);
+  }, []);
+
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+        <h2 style={{ flex: 1 }}>Devices</h2>
+        <Link to="/devices/new" className="btn btn-accent">
+          + Add Device
+        </Link>
+      </div>
+      {loading ? (
+        <div>Loading...</div>
+      ) : devices.length === 0 ? (
+        <p>No devices yet.</p>
+      ) : (
+        <table className="modern-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>MAC Address</th>
+              <th>IP</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {devices.map((dev) => (
+              <tr key={dev.id}>
+                <td>{dev.name}</td>
+                <td>{dev.mac}</td>
+                <td>{dev.ip || "-"}</td>
+                <td>
+                  <span
+                    style={{
+                      color:
+                        dev.device_status === "online"
+                          ? "green"
+                          : "var(--secondary, #666)"
+                    }}
+                  >
+                    {dev.device_status}
+                  </span>
+                </td>
+                <td>
+                  <Link to={`/devices/${dev.id}/edit`} className="btn btn-link">
+                    Edit
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
+export default DevicesPage;

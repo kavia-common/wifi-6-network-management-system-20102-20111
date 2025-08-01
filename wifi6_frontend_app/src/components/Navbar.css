@@ -1,0 +1,80 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 0.6rem 2rem;
+  border-bottom: 1px solid var(--border-color);
+  min-height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-brand {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--primary, #1976d2);
+}
+
+.navbar-center .nav-link {
+  margin: 0 0.75rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.navbar-center .nav-link:hover,
+.navbar-center .nav-link.active {
+  color: var(--accent, #ff9800);
+}
+
+.navbar-right .theme-toggle {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  margin-right: 0.9rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.btn {
+  font-size: 1rem;
+  padding: 4px 16px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-link {
+  background: none;
+  color: var(--primary, #1976d2);
+  text-decoration: underline;
+}
+
+.btn-accent {
+  background: var(--accent, #ff9800);
+  color: #fff;
+}
+
+.logout-btn {
+  background: var(--secondary, #424242);
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.6rem 1rem;
+  }
+  .navbar-center {
+    margin: 0.5rem 0;
+  }
+}
